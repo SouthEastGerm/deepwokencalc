@@ -1268,18 +1268,21 @@ const options = [
 
         document.getElementById("suggestions").innerHTML = html;
       }
+    
+      let weaponStats = 0
 
       document
         .getElementById("weaponStats")
         .addEventListener("input", function () {
-          let weaponStats = document.getElementById("weaponStats").value;
+          weaponStats = document.getElementById("weaponStats").value;
           document.getElementById("textbox1").value = "";
         });
 
+        let atunementStats = 0
       document
         .getElementById("atunementStats")
         .addEventListener("input", function () {
-          let atunementStats = parseFloat(this.value);
+           atunementStats = parseFloat(this.value);
         });
 
       async function updateOutput() {
