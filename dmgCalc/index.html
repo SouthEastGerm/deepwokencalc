@@ -1,0 +1,1348 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Deepwoken Damage Calculator</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-image: url("imgs/dbackground.jpg");
+        background-size: cover;
+        text-align: center;
+        margin: 0;
+        padding: 0;
+      }
+      .container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+      }
+      h1 {
+        color: white;
+        margin-bottom: 50px;
+      }
+      input[type="text"] {
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        margin-bottom: 20px;
+        width: 300px;
+        font-size: 16px;
+        text-align: center;
+      }
+      button {
+        padding: 10px 20px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        background-color: #4CAF50;
+        color: white;
+        font-size: 16px;
+        cursor: pointer;
+        margin-bottom: 20px;
+      }
+      .input-group {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 50px;
+      }
+      .output {
+  background-color: white; /* change the background color to white */
+  color: black; /* change the text color to black */
+  padding: 20px;
+  border-radius: 5px;
+  width: 300px;
+  text-align: center;
+  margin-top: 50px;
+}
+      label {
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Deepwoken Damage Calculator</h1>
+      <div class="input-group">
+        <label for="textBox">Weapon:</label>
+        <input
+        type="text"
+        id="textBox"
+        onkeyup="showSuggestions(this.value)"
+        list="suggestions"
+      />
+      <datalist id="suggestions"> </datalist>
+      <br>
+      <label for="alloyed">Alloyed or Unalloyed?</label>
+      <select id="alloyed">
+        <option value="no">No</option>
+        <option value="yes">Yes</option>
+      </select>
+      <br><br>  
+      <div class="input-group">
+        <label for="weaponStats">Weapon Stats:</label>
+        <input type="text" id="weaponStats">
+      </div>
+      <div class="input-group">
+        <label for="atunementStats">Attunement Stats:</label>
+        <input type="text" id="atunementStats">
+      </div>
+      <button onclick="updateOutput()">Calculate Damage</button>
+      <div class="output">
+        <div id="output"></div>
+      </div>      
+    <script>
+const weapons = [
+    {
+      name: "Stiletto",
+      baseDMG: 11,
+      hasAlloy: false,
+      alloyedDMG: null,
+      pen: 0,
+      alloyedPen: 0,
+      scaling: 3,
+      alloyedScaling: null,
+      elemental: false,
+    },
+    {
+      name: "Gilded Knife",
+      baseDMG: 13,
+      hasAlloy: false,
+      alloyedDMG: null,
+      pen: 0,
+      alloyedPen: 0,
+      scaling: 8,
+      alloyedScaling: null,
+      elemental: false,
+    },
+    {
+      name: "Silver Weapon",
+      baseDMG: 12,
+      hasAlloy: false,
+      alloyedDMG: null,
+      pen: 0,
+      alloyedPen: 0,
+      scaling: 6,
+      alloyedScaling: null,
+      elemental: false,
+    },
+    {
+      name: "Canor Fang",
+      baseDMG: 11,
+      hasAlloy: false,
+      alloyedDMG: null,
+      pen: 5,
+      alloyedPen: 0,
+      scaling: 10,
+      alloyedScaling: null,
+      elemental: false,
+    },
+    {
+      name: "Whaling Knife",
+      baseDMG: 15,
+      hasAlloy: true,
+      alloyedDMG: 15,
+      pen: 0,
+      alloyedPen: 10,
+      scaling: 5,
+      alloyedScaling: 8,
+      elemental: false,
+    },
+    {
+      name: "Champions Weapon",
+      baseDMG: 14.5,
+      hasAlloy: false,
+      alloyedDMG: null,
+      pen: 0,
+      alloyedPen: 0,
+      scaling: 8,
+      alloyedScaling: null,
+      elemental: false,
+    },
+    {
+      name: "Central Dirk",
+      baseDMG: 15,
+      hasAlloy: false,
+      alloyedDMG: null,
+      pen: 5,
+      scaling: 7,
+      alloyedScaling: null,
+      elemental: false,
+    },
+    {
+      name: "Tanto",
+      baseDMG: 15.5,
+      hasAlloy: true,
+      alloyedDMG: 16,
+      pen: 0,
+      alloyedPen: 5,
+      scaling: 8,
+      alloyedScaling: 8.5,
+      elemental: false,
+    },
+    {
+      name: "Nemits Sickle",
+      baseDMG: 10,
+      hasAlloy: false,
+      alloyedDMG: null,
+      pen: 30,
+      alloyedPen: 0,
+      scaling: 14,
+      alloyedScaling: null,
+      elemental: false,
+    },
+    {
+      name: "Krulian Knife",
+      baseDMG: 12.5,
+      hasAlloy: false,
+      alloyedDMG: null,
+      pen: 20,
+      alloyedPen: 0,
+      scaling: 10,
+      alloyedScaling: null,
+      elemental: false,
+    },
+    {
+      name: "Kyrsedge",
+      baseDMG: 13,
+      hasAlloy: false,
+      alloyedDMG: null,
+      pen: 30,
+      alloyedPen: 0,
+      scaling: 9,
+      alloyedScaling: null,
+      elemental: false,
+    },
+    {
+      name: "Fist (Way of Navae/ Legion Kata)",
+      baseDMG: 12,
+      hasAlloy: false,
+      alloyedDMG: null,
+      pen: 0,
+      alloyedPen: 0,
+      scaling: 7,
+      alloyedScaling: null,
+      elemental: false,
+    },
+    {
+      name: "lron Cestus",
+      baseDMG: 13.5,
+      hasAlloy: false,
+      alloyedDMG: null,
+      pen: 0,
+      alloyedPen: 0,
+      scaling: 7,
+      alloyedScaling: null,
+      elemental: false,
+    },
+    {
+      name: "Legion Cestus",
+      baseDMG: 15,
+      hasAlloy: false,
+      alloyedDMG: null,
+      pen: 5,
+      alloyedPen: 0,
+      scaling: 9,
+      alloyedScaling: null,
+      elemental: false,
+    },
+    {
+      name: "Jus Karita",
+      baseDMG: 13.5,
+      hasAlloy: false,
+      alloyedDMG: null,
+      pen: 20,
+      alloyedPen: 0,
+      scaling: 9,
+      alloyedScaling: null,
+      elemental: false,
+    },
+    {
+      name: "Flamekeeper Cestus",
+      baseDMG: 15.5,
+      hasAlloy: false,
+      alloyedDMG: null,
+      pen: 5,
+      alloyedPen: 0,
+      scaling: 9.5,
+      alloyedScaling: null,
+      elemental: false,
+    },
+    {
+      name: "Light's Final Toll",
+      baseDMG: 12,
+      hasAlloy: false,
+      alloyedDMG: null,
+      pen: 5,
+      alloyedPen: 0,
+      scaling: 13,
+      alloyedScaling: null,
+      elemental: false,
+    },
+    {
+      name: "Silversix",
+      baseDMG: 10,
+      hasAlloy: false,
+      alloyedDMG: null,
+      pen: 0,
+      alloyedPen: 0,
+      scaling: 13,
+      alloyedScaling: null,
+      elemental: false,
+    },
+    {
+      name: "Flintlock",
+      baseDMG: 11,
+      hasAlloy: false,
+      alloyedDMG: null,
+      pen: 0,
+      alloyedPen: 0,
+      scaling: 12,
+      alloyedScaling: null,
+      elemental: false,
+    },
+    {
+      name: "Revolver",
+      baseDMG: 14,
+      hasAlloy: false,
+      alloyedDMG: null,
+      pen: 0,
+      alloyedPen: 0,
+      scaling: 15,
+      alloyedScaling: null,
+      elemental: false,
+    },
+    {
+      name: "Dragoon",
+      baseDMG: 18,
+      hasAlloy: false,
+      alloyedDMG: null,
+      pen: 0,
+      alloyedPen: 0,
+      scaling: 12,
+      alloyedScaling: null,
+      elemental: false,
+    },
+    {
+      name: "Quickfang",
+      baseDMG: 12,
+      hasAlloy: false,
+      alloyedDMG: null,
+      pen: 5,
+      alloyedPen: 0,
+      scaling: 7,
+      alloyedScaling: null,
+      elemental: false,
+    },
+    {
+      name: "Apprentice Rapier",
+      baseDMG: 13,
+      hasAlloy: false,
+      alloyedDMG: null,
+      pen: 0,
+      alloyedPen: 0,
+      scaling: 6,
+      alloyedScaling: null,
+      elemental: false,
+    },
+    {
+      name: "Inquisitor's Thorn",
+      baseDMG: 14,
+      hasAlloy: false,
+      alloyedDMG: null,
+      pen: 10,
+      alloyedPen: 0,
+      scaling: 7,
+      alloyedScaling: null,
+      elemental: false,
+    },
+    {
+      name: "Crucible Rapier",
+      baseDMG: 14,
+      hasAlloy: false,
+      alloyedDMG: null,
+      pen: 20,
+      alloyedPen: 0,
+      scaling: 8,
+      alloyedScaling: null,
+      elemental: false,
+    },
+    {
+      name: "Skullpiercer",
+      baseDMG: 14,
+      hasAlloy: false,
+      alloyedDMG: null,
+      pen: 10,
+      alloyedPen: 0,
+      scaling: 7.5,
+      alloyedScaling: null,
+      elemental: false,
+    },
+    {
+      name: "Kyrstreza",
+      baseDMG: 15,
+      hasAlloy: false,
+      alloyedDMG: null,
+      pen: 30,
+      alloyedPen: 0,
+      scaling: 8.5,
+      alloyedScaling: null,
+      elemental: false,
+    },
+    {
+      name: "Sword",
+      baseDMG: 18,
+      hasAlloy: false,
+      alloyedDMG: null,
+      pen: 0,
+      alloyedPen: 0,
+      scaling: 2.5,
+      alloyedScaling: null,
+      elemental: false,
+    },
+    {
+      name: "Messer",
+      baseDMG: 20,
+      hasAlloy: true,
+      alloyedDMG: 21,
+      pen: 0,
+      alloyedPen: 10,
+      scaling: 5,
+      alloyedScaling: 6,
+      elemental: false,
+    },
+    {
+      name: "Falchion",
+      baseDMG: 16,
+      hasAlloy: true,
+      alloyedDMG: 16,
+      pen: 0,
+      alloyedPen: 20,
+      scaling: 6,
+      alloyedScaling: 7,
+      elemental: false,
+    },
+    {
+      name: "Scimitar",
+      baseDMG: 15,
+      hasAlloy: false,
+      alloyedDMG: null,
+      pen: 0,
+      alloyedPen: 0,
+      scaling: 3,
+      alloyedScaling: null,
+      elemental: false,
+    },
+    {
+      name: "Katana",
+      baseDMG: 18,
+      hasAlloy: false,
+      alloyedDMG: null,
+      pen: 0,
+      alloyedPen: 0,
+      scaling: 6,
+      alloyedScaling: null,
+      elemental: false,
+    },
+    {
+      name: "Worshipper Longsword",
+      baseDMG: 19,
+      hasAlloy: false,
+      alloyedDMG: null,
+      pen: 0,
+      alloyedPen: 0,
+      scaling: 4,
+      alloyedScaling: null,
+      elemental: false,
+    },
+    {
+      name: "Officer Saber",
+      baseDMG: 22,
+      hasAlloy: false,
+      alloyedDMG: null,
+      pen: 0,
+      alloyedPen: 0,
+      scaling: 4.5,
+      alloyedScaling: null,
+      elemental: false,
+    },
+    {
+      name: "Vigil Longsword",
+      baseDMG: 20,
+      hasAlloy: true,
+      alloyedDMG: 20,
+      pen: 0,
+      alloyedPen: 15,
+      scaling: 6,
+      alloyedScaling: 7,
+      elemental: false,
+    },
+    {
+      name: "Champion's Sword",
+      baseDMG: 19,
+      hasAlloy: false,
+      alloyedDMG: null,
+      pen: 0,
+      alloyedPen: 0,
+      scaling: 6.5,
+      alloyedScaling: null,
+      elemental: false,
+    },
+    {
+      name: "Cavalry Saber",
+      baseDMG: 21,
+      hasAlloy: false,
+      alloyedDMG: null,
+      pen: 0,
+      alloyedPen: 0,
+      scaling: 5,
+      alloyedScaling: null,
+      elemental: false,
+    },
+    {
+      name: "Shotel",
+      baseDMG: 22,
+      hasAlloy: true,
+      alloyedDMG: 22,
+      pen: 0,
+      alloyedPen: 10,
+      scaling: 5,
+      alloyedScaling: 6,
+      elemental: false,
+    },
+    {
+      name: "Warden Ceremonial Sword",
+      baseDMG: 17,
+      hasAlloy: false,
+      alloyedDMG: null,
+      pen: 0,
+      alloyedPen: 0,
+      scaling: 7,
+      alloyedScaling: null,
+      elemental: false,
+    },
+    {
+      name: "Razor Cutlass",
+      baseDMG: 18,
+      hasAlloy: false,
+      alloyedDMG: null,
+      pen: 20,
+      alloyedPen: 0,
+      scaling: 7.5,
+      alloyedScaling: null,
+      elemental: false,
+    },
+    {
+      name: "Forgotten Gladius",
+      baseDMG: 18,
+      hasAlloy: false,
+      alloyedDMG: null,
+      pen: 13,
+      alloyedPen: 0,
+      scaling: 7,
+      alloyedScaling: null,
+      elemental: false,
+    },
+    {
+      name: "Serpent's Edge",
+      baseDMG: 22,
+      hasAlloy: false,
+      alloyedDMG: null,
+      pen: 5,
+      alloyedPen: 0,
+      scaling: 6,
+      alloyedScaling: null,
+      elemental: false,
+    },
+    {
+      name: "Hallowscleave",
+      baseDMG: 19,
+      hasAlloy: false,
+      alloyedDMG: null,
+      pen: 35,
+      alloyedPen: 0,
+      scaling: 7,
+      alloyedScaling: null,
+      elemental: false,
+    },
+    {
+      name: "Kyrsblade",
+      baseDMG: 22,
+      hasAlloy: false,
+      alloyedDMG: null,
+      pen: 5,
+      alloyedPen: 0,
+      scaling: 6,
+      alloyedScaling: null,
+      elemental: false,
+    },
+    {
+      name: "Shattered Katana",
+      baseDMG: 20,
+      hasAlloy: false,
+      alloyedDMG: null,
+      pen: 30,
+      alloyedPen: 0,
+      scaling: 7,
+      alloyedScaling: null,
+      elemental: false,
+    },
+    {
+      name: "Irontusk",
+      baseDMG: 16.5,
+      hasAlloy: false,
+      alloyedDMG: null,
+      pen: 10,
+      alloyedPen: 0,
+      scaling: 3,
+      alloyedScaling: null,
+      elemental: false,
+    },
+    {
+      name: "Iron Spear",
+      baseDMG: 17,
+      hasAlloy: false,
+      alloyedDMG: null,
+      pen: 10,
+      alloyedPen: 0,
+      scaling: 2.5,
+      alloyedScaling: null,
+      elemental: false,
+    },
+    {
+      name: "Gremorian Longspear",
+      baseDMG: 18,
+      hasAlloy: true,
+      alloyedDMG: null,
+      pen: 0,
+      alloyedPen: 0,
+      scaling: 4,
+      alloyedScaling: null,
+      elemental: false,
+    },
+    {
+      name: "Ritual Spear",
+      baseDMG: 19,
+      hasAlloy: false,
+      alloyedDMG: null,
+      pen: 25,
+      alloyedPen: 0,
+      scaling: 5,
+      alloyedScaling: null,
+      elemental: false,
+    },
+    {
+      name: "Acheron's Warspear",
+      baseDMG: 18,
+      hasAlloy: false,
+      alloyedDMG: null,
+      pen: 15,
+      alloyedPen: 0,
+      scaling: 6,
+      alloyedScaling: null,
+      elemental: false,
+    },
+    {
+      name: "Trident Spear",
+      baseDMG: 19,
+      hasAlloy: true,
+      alloyedDMG: null,
+      pen: 25,
+      alloyedPen: 0,
+      scaling: 6,
+      alloyedScaling: null,
+      elemental: false,
+    },
+    {
+      name: "Serrated Warspear",
+      baseDMG: 20,
+      hasAlloy: false,
+      alloyedDMG: null,
+      pen: 20,
+      alloyedPen: 0,
+      scaling: 6,
+      alloyedScaling: null,
+      elemental: false,
+    },
+    {
+      name: "Rifle Spear",
+      baseDMG: 21,
+      hasAlloy: false,
+      alloyedDMG: null,
+      pen: 25,
+      alloyedPen: 0,
+      scaling: 7,
+      alloyedScaling: null,
+      elemental: false,
+    },
+    {
+      name: "True Seraph's Spear",
+      baseDMG: 18.5,
+      hasAlloy: false,
+      alloyedDMG: null,
+      pen: 20,
+      alloyedPen: 0,
+      scaling: 6,
+      alloyedScaling: null,
+      elemental: false,
+    },
+    {
+      name: "Kyrsglaive",
+      baseDMG: 19.5,
+      hasAlloy: false,
+      alloyedDMG: null,
+      pen: 20,
+      alloyedPen: 0,
+      scaling: 5,
+      alloyedScaling: null,
+      elemental: false,
+    },
+    {
+      name: "Mace",
+      baseDMG: 20,
+      hasAlloy: false,
+      alloyedDMG: null,
+      pen: 0,
+      alloyedPen: 0,
+      scaling: 5,
+      alloyedScaling: null,
+      elemental: false,
+    },
+    {
+      name: "Sacred Hammer",
+      baseDMG: 19.5,
+      hasAlloy: false,
+      alloyedDMG: null,
+      pen: 10,
+      alloyedPen: 0,
+      scaling: 7,
+      alloyedScaling: null,
+      elemental: false,
+    },
+    {
+      name: "Rosen's Peacemaker",
+      baseDMG: 18,
+      hasAlloy: false,
+      alloyedDMG: null,
+      pen: 0,
+      alloyedPen: 0,
+      scaling: 8,
+      alloyedScaling: null,
+      elemental: false,
+    },
+    {
+      name: "Iron Bunderbuss",
+      baseDMG: 20,
+      hasAlloy: false,
+      alloyedDMG: null,
+      pen: 25,
+      alloyedPen: 0,
+      scaling: 6,
+      alloyedScaling: null,
+      elemental: false,
+    },
+    {
+      name: "Battleaxe",
+      baseDMG: 20,
+      hasAlloy: false,
+      alloyedDMG: null,
+      pen: 0,
+      alloyedPen: 0,
+      scaling: 5,
+      alloyedScaling: null,
+      elemental: false,
+    },
+    {
+      name: "Halberd",
+      baseDMG: 22,
+      hasAlloy: true,
+      alloyedDMG: 24,
+      pen: 0,
+      alloyedPen: 15,
+      scaling: 7,
+      alloyedScaling: 8,
+      elemental: false,
+    },
+    {
+      name: "Adretian Axe",
+      baseDMG: 24,
+      hasAlloy: false,
+      alloyedDMG: null,
+      pen: 0,
+      alloyedPen: 0,
+      scaling: 7,
+      alloyedScaling: null,
+      elemental: false,
+    },
+    {
+      name: "Canorian Axe",
+      baseDMG: 23.5,
+      hasAlloy: true,
+      alloyedDMG: 24,
+      pen: 0,
+      alloyedPen: 10,
+      scaling: 7,
+      alloyedScaling: 9,
+      elemental: false,
+    },
+    {
+      name: "Iron Birch",
+      baseDMG: 26.5,
+      hasAlloy: false,
+      alloyedDMG: null,
+      pen: 0,
+      alloyedPen: 0,
+      scaling: 6,
+      alloyedScaling: null,
+      elemental: false,
+    },
+    {
+      name: "Evanspear Hand Axe",
+      baseDMG: 25,
+      hasAlloy: false,
+      alloyedDMG: null,
+      pen: 0,
+      alloyedPen: 0,
+      scaling: 9.5,
+      alloyedScaling: null,
+      elemental: false,
+    },
+    {
+      name: "Night Axe",
+      baseDMG: 22,
+      hasAlloy: false,
+      alloyedDMG: null,
+      pen: 5,
+      alloyedPen: 0,
+      scaling: 8,
+      alloyedScaling: null,
+      elemental: false,
+    },
+    {
+      name: "Master Hawk's HandAxe",
+      baseDMG: 24.5,
+      hasAlloy: false,
+      alloyedDMG: null,
+      pen: 0,
+      alloyedPen: 0,
+      scaling: 10,
+      alloyedScaling: null,
+      elemental: false,
+    },
+    {
+      name: "Relic Axe",
+      baseDMG: 25,
+      hasAlloy: false,
+      alloyedDMG: null,
+      pen: 10,
+      alloyedPen: 0,
+      scaling: 9,
+      alloyedScaling: null,
+      elemental: false,
+    },
+    {
+      name: "Enforcer's Axe",
+      baseDMG: 26,
+      hasAlloy: false,
+      alloyedDMG: null,
+      pen: 0,
+      alloyedPen: 0,
+      scaling: 10,
+      alloyedScaling: null,
+      elemental: false,
+    },
+    {
+      name: "Skyreap Blade",
+      baseDMG: 23,
+      hasAlloy: false,
+      alloyedDMG: null,
+      pen: 20,
+      alloyedPen: 0,
+      scaling: 7,
+      alloyedScaling: null,
+      elemental: false,
+    },
+    {
+      name: "Avenger",
+      baseDMG: 21,
+      hasAlloy: false,
+      alloyedDMG: null,
+      pen: 0,
+      alloyedPen: 0,
+      scaling: 6.5,
+      alloyedScaling: null,
+      elemental: false,
+    },
+    {
+      name: "Zweihander",
+      baseDMG: 22,
+      hasAlloy: true,
+      alloyedDMG: 23,
+      pen: 0,
+      alloyedPen: 10,
+      scaling: 7,
+      alloyedScaling: 10,
+      elemental: false,
+    },
+    {
+      name: "Markor's Inheritor",
+      baseDMG: 23,
+      hasAlloy: false,
+      alloyedDMG: null,
+      pen: 10,
+      alloyedPen: 0,
+      scaling: 7,
+      alloyedScaling: null,
+      elemental: false,
+    },
+    {
+      name: "Crescent Cleaver",
+      baseDMG: 22.4,
+      hasAlloy: true,
+      alloyedDMG: 22.4,
+      pen: 0,
+      alloyedPen: 10,
+      scaling: 8,
+      alloyedScaling: 9,
+      elemental: false,
+    },
+    {
+      name: "Darksteel Greatsword",
+      baseDMG: 26,
+      hasAlloy: true,
+      alloyedDMG: 26,
+      pen: 0,
+      alloyedPen: 0,
+      scaling: 7,
+      alloyedScaling: 7.5,
+      elemental: false,
+    },
+    {
+      name: "Inquisitor's Straight Sword",
+      baseDMG: 23.5,
+      hasAlloy: false,
+      alloyedDMG: null,
+      pen: 0,
+      alloyedPen: 0,
+      scaling: 8.3,
+      alloyedScaling: null,
+      elemental: false,
+    },
+    {
+      name: "First Light",
+      baseDMG: 24,
+      hasAlloy: false,
+      alloyedDMG: null,
+      pen: 30,
+      alloyedPen: 0,
+      scaling: 8,
+      alloyedScaling: null,
+      elemental: false,
+    },
+    {
+      name: "Kyrscleave",
+      baseDMG: 24,
+      hasAlloy: false,
+      alloyedDMG: null,
+      pen: 15,
+      alloyedPen: 0,
+      scaling: 8.5,
+      alloyedScaling: null,
+      elemental: false,
+    },
+    {
+      name: "Railblade",
+      baseDMG: 22,
+      hasAlloy: false,
+      alloyedDMG: null,
+      pen: 25,
+      alloyedPen: 0,
+      scaling: 8.3,
+      alloyedScaling: null,
+      elemental: false,
+    },
+    {
+      name: "Enforcer's Blade",
+      baseDMG: 25,
+      hasAlloy: false,
+      alloyedDMG: null,
+      pen: 0,
+      alloyedPen: 0,
+      scaling: 9,
+      alloyedScaling: null,
+      elemental: false,
+    },
+    {
+      name: "Steel Maul",
+      baseDMG: 22,
+      hasAlloy: true,
+      alloyedDMG: null,
+      pen: 0,
+      alloyedPen: 0,
+      scaling: 7,
+      alloyedScaling: null,
+      elemental: false,
+    },
+    {
+      name: "Forge Greathammer",
+      baseDMG: 24,
+      hasAlloy: false,
+      alloyedDMG: null,
+      pen: 0,
+      alloyedPen: 0,
+      scaling: 8,
+      alloyedScaling: null,
+      elemental: false,
+    },
+    {
+      name: "Great Maul",
+      baseDMG: 25,
+      hasAlloy: false,
+      alloyedDMG: null,
+      pen: 5,
+      alloyedPen: 0,
+      scaling: 8.3,
+      alloyedScaling: null,
+      elemental: false,
+    },
+    {
+      name: "Pale Morning",
+      baseDMG: 24,
+      hasAlloy: false,
+      alloyedDMG: null,
+      pen: 0,
+      alloyedPen: 0,
+      scaling: 9,
+      alloyedScaling: null,
+      elemental: false,
+    },
+    {
+      name: "Petra's Anchor",
+      baseDMG: 26,
+      hasAlloy: false,
+      alloyedDMG: null,
+      pen: 15,
+      alloyedPen: 0,
+      scaling: 8,
+      alloyedScaling: null,
+      elemental: false,
+    },
+    {
+      name: "Enforcer's Hammer",
+      baseDMG: 25,
+      hasAlloy: false,
+      alloyedDMG: null,
+      pen: 10,
+      alloyedPen: 0,
+      scaling: 9,
+      alloyedScaling: null,
+      elemental: false,
+    },
+    {
+      name: "Hivelord's Hubris",
+      baseDMG: 30,
+      hasAlloy: false,
+      alloyedDMG: null,
+      pen: 5,
+      alloyedPen: 0,
+      scaling: 10,
+      alloyedScaling: null,
+      elemental: false,
+    },
+    {
+      name: "Hero Blade of Flame",
+      baseDMG: 20,
+      hasAlloy: false,
+      alloyedDMG: null,
+      pen: 10,
+      alloyedPen: 0,
+      elementScaling: 6.5,
+      alloyedScaling: null,
+      elemental1: true,
+      elemental2: false,
+    },
+    {
+      name: "Hero Blade of Lightning",
+      baseDMG: 20,
+      hasAlloy: false,
+      alloyedDMG: null,
+      pen: 10,
+      alloyedPen: 0,
+      elementScaling: 6.5,
+      alloyedScaling: null,
+      elemental1: true,
+      elemental2: false,
+    },
+    {
+      name: "Hero Blade of Frost",
+      baseDMG: 20,
+      hasAlloy: false,
+      alloyedDMG: null,
+      pen: 10,
+      alloyedPen: 0,
+      elementScaling: 6.5,
+      alloyedScaling: null,
+      elemental1: true,
+      elemental2: false,
+    },
+    {
+      name: "Hero Blade of Wind",
+      baseDMG: 20,
+      hasAlloy: false,
+      alloyedDMG: null,
+      pen: 10,
+      alloyedPen: 0,
+      elementScaling: 6.5,
+      alloyedScaling: null,
+      elemental1: true,
+      elemental2: false,
+    },
+    {
+      name: "Hero Blade of Shadow",
+      baseDMG: 20,
+      hasAlloy: false,
+      alloyedDMG: null,
+      pen: 10,
+      alloyedPen: 0,
+      elementScaling: 6.5,
+      alloyedScaling: null,
+      elemental1: true,
+      elemental2: false,
+    },
+    {
+      name: "Curved Blade of Winds",
+      baseDMG: 17.5,
+      hasAlloy: false,
+      alloyedDMG: null,
+      pen: 15,
+      alloyedPen: 0,
+      scaling: 5,
+      elementScaling: 4,
+      alloyedScaling: null,
+      elemental1: false,
+      elemental2: true,  
+    },
+    {
+      name: "Crypt Blade",
+      baseDMG: 22,
+      hasAlloy: false,
+      alloyedDMG: null,
+      pen: 0,
+      alloyedPen: 0,
+      scaling: 4,
+      elementScaling: 9,
+      alloyedScaling: null,
+      elemental1: false,
+      elemental2: true,  
+    },
+    {
+      name: "Gran Sudaruska",
+      baseDMG: 23.5,
+      hasAlloy: false,
+      alloyedDMG: null,
+      pen: 0,
+      alloyedPen: 0,
+      scaling: 4,
+      elementScaling: 8,
+      alloyedScaling: null,
+      elemental1: false,
+      elemental2: true,  
+    },
+  ];
+
+      async function getStat(weaponName, wantedStat) {
+        let weapon = weapons.find((weapon) => weapon.name === weaponName);
+        if (weapon) {
+          let stat = weapon[wantedStat];
+          return stat;
+        }
+      }
+const options = [
+    "Stiletto",
+    "Gilded Knife",
+    "Silver Weapon",
+    "Canor Fang",
+    "Whaling Knife",
+    "Champions Weapon",
+    "Central Dirk",
+    "Tanto",
+    "Nemits Sickle",
+    "Krulian Knife",
+    "Kyrsedge",
+    "Fist (Way of Navae/ Legion Kata)",
+    "Iron Cestus",
+    "Legion Cestus",
+    "Jus Karita",
+    "Flamekeeper Cestus",
+    "Light's Final Toll",
+    "Silversix",
+    "Flintlock",
+    "Revolver",
+    "Dragoon",
+    "Quickfang",
+    "Apprentice Rapier",
+    "Inquisitor's Thorn",
+    "Crucile Rapier",
+    "Skullpiercer",
+    "Kyrstreza",
+    "Sword",
+    "Messer",
+    "Falchion",
+    "Scimitar",
+    "Katana",
+    "Worshipper Longsword",
+    "Officer Saber",
+    "Vigil Longsword",
+    "Champion's Sword",
+    "Cavalry Saber",
+    "Shotel",
+    "Warden Ceremonial Sword",
+    "Razor Cutlass",
+    "Forgotten Gladius",
+    "Serpent's Edge",
+    "Hallowscleave",
+    "Kyrslade",
+    "Shattered Katana",
+    "Irontusk",
+    "Iron Spear",
+    "Gremorian Longspear",
+    "Ritual Spear",
+    "Acheron's Warspear",
+    "Trident Spear",
+    "Serrated Warspear",
+    "Rifle Spear",
+    "True Seraph's Spear",
+    "Kyrsglaive",
+    "Mace",
+    "Sacred Hammer",
+    "Rosen's Peacemaker",
+    "Iron underuss",
+    "Battleaxe",
+    "Halberd",
+    "Adretian Axe",
+    "Canorian Axe",
+    "Iron Birch",
+    "Evanspear Hand Axe",
+    "Night Axe",
+    "Master Hawk's HandAxe",
+    "Relic Axe",
+    "Enforcer's Axe",
+    "Skyreap Blade",
+    "Avenger",
+    "Zweihander",
+    "Markor's Inheritor",
+    "Crescent Cleaver",
+    "Darksteel Greatsword",
+    "Inquisitor's Straight Sword",
+    "First Light",
+    "Kyrscleave",
+    "Raillade",
+    "Enforcer's Blade",
+    "Steel Maul",
+    "Forge Greathammer",
+    "Great Maul",
+    "Pale Morning",
+    "Petra's Anchor",
+    "Enforcer's Hammer",
+    "Hivelord's Huris",
+    "Hero Blade of Flame",
+    "Hero Blade of Lightning",
+    "Hero Blade of Frost",
+    "Hero Blade of Wind",
+    "Hero Blade of Shadow",
+    "Curved Blade of Winds",
+    "Crypt Blade",
+    "Gran Sudaruska"
+  ];
+
+      function showSuggestions(str) {
+        const suggestions = options.filter((option) =>
+          option.toLowerCase().includes(str.toLowerCase())
+        );
+
+        let html = "";
+        for (const suggestion of suggestions) {
+          html += `<option value="${suggestion}">`;
+        }
+
+        document.getElementById("suggestions").innerHTML = html;
+      }
+
+      document
+        .getElementById("weaponStats")
+        .addEventListener("input", function () {
+          let weaponStats = document.getElementById("weaponStats").value;
+          document.getElementById("textbox1").value = "";
+        });
+
+      document
+        .getElementById("atunementStats")
+        .addEventListener("input", function () {
+          let atunementStats = parseFloat(this.value);
+        });
+
+      async function updateOutput() {
+        let weaponStats = parseFloat(
+          document.getElementById("weaponStats").value
+        );
+        console.log(weaponStats);
+
+        let atunementStats = parseFloat(
+          document.getElementById("atunementStats").value
+        );
+        console.log(atunementStats);
+
+        let selectedOption = document.getElementById("textBox").value;
+        console.log(selectedOption);
+        
+        let alloyCheck = document.getElementById("alloyed").value;
+        console.log(alloyCheck);
+
+        if (alloyCheck === "yes" && await getStat(selectedOption, "hasAlloy") === true) {
+          document.getElementById("output").innerHTML =      
+          await getStat(selectedOption, "alloyedDMG") +
+        await getStat(selectedOption, "alloyedDMG") *
+          await getStat(selectedOption, "alloyedScaling") *
+          await weaponStats /
+          1000
+        }
+        else if (alloyCheck === "yes" && await getStat(selectedOption, "hasAlloy") === false){
+          document.getElementById("output").innerHTML = "This weapon cannot be alloyed."      
+        }
+        else if (await getStat(selectedOption, "elemental1") === true) {
+          document.getElementById("output").innerHTML =      
+          await getStat(selectedOption, "baseDMG") +
+        await getStat(selectedOption, "baseDMG") *
+          await getStat(selectedOption, "elementScaling") *
+          atunementStats /
+          1000
+        }
+        else if (await getStat(selectedOption, "elemental2") === true){
+          document.getElementById("output").innerHTML =      
+          await getStat(selectedOption, "baseDMG") +
+        await getStat(selectedOption, "baseDMG") *
+          await getStat(selectedOption, "scaling") *
+          weaponStats /
+          1000 +
+          await getStat(selectedOption, "baseDMG") *
+            await getStat(selectedOption, "elementScaling") *
+            atunementStats /
+            1000
+        } else {
+          document.getElementById("output").innerHTML =      
+          await getStat(selectedOption, "baseDMG") +
+        await getStat(selectedOption, "baseDMG") *
+          await getStat(selectedOption, "scaling") *
+          weaponStats /
+          1000
+        }
+        }
+
+      function setTextBoxValue(event) {
+        document.getElementById("textBox").value = event.target.innerText;
+        document.getElementById("suggestions").innerHTML = "";
+      }
+    </script>
+  </head>
+</html>
