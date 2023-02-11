@@ -1,2 +1,0 @@
-# deepwokencalc
-Deepwoken damage calculator.
