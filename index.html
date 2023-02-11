@@ -1275,28 +1275,32 @@ const options = [
           let weaponStats = document.getElementById("weaponStats").value;
           document.getElementById("textbox1").value = "";
         });
-        if (weaponStats === NaN) {
-          weaponStats = 0;
-        }
 
       document
         .getElementById("atunementStats")
         .addEventListener("input", function () {
           let atunementStats = parseFloat(this.value);
         });
-        if (atunementStats === NaN) {
-          atunementStats = 0;
-        }
+
 
       async function updateOutput() {
         let weaponStats = parseFloat(
           document.getElementById("weaponStats").value
         );
-        console.log(weaponStats);
 
         let atunementStats = parseFloat(
           document.getElementById("atunementStats").value
         );
+        
+        if (weaponStats === NaN) {
+          weaponStats = 0;
+        };
+
+        if (atunementStats === NaN) {
+          atunementStats = 0;
+        };
+
+        console.log(weaponStats);
         console.log(atunementStats);
 
         let selectedOption = document.getElementById("textBox").value;
