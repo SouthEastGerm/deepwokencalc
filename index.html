@@ -1292,11 +1292,11 @@ const options = [
           document.getElementById("atunementStats").value
         );
         
-        if (weaponStats === NaN) {
+        if (isNaN(weaponStats)) {
           weaponStats = 0;
         };
 
-        if (atunementStats === NaN) {
+        if (isNaN(atunementStats)) {
           atunementStats = 0;
         };
 
