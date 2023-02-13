@@ -1282,22 +1282,26 @@ const options = [
           let atunementStats = parseFloat(this.value);
         });
 
+        if(document.getElementById("atunementStats").value === "") {
+          document.getElementById("atunementStats").value = 0
+        };
+        
+        if(document.getElementById("weaponStats").value === "") {
+          document.getElementById("weaponStats").value = 0
+        };
+        
       async function updateOutput() {
         let weaponStats = parseFloat(
           document.getElementById("weaponStats").value
         );
-        console.log(weaponStats);
 
         let atunementStats = parseFloat(
           document.getElementById("atunementStats").value
         );
-        console.log(atunementStats);
 
         let selectedOption = document.getElementById("textBox").value;
-        console.log(selectedOption);
         
         let alloyCheck = document.getElementById("alloyed").value;
-        console.log(alloyCheck);
 
         if (alloyCheck === "yes" && await getStat(selectedOption, "hasAlloy") === true) {
           document.getElementById("output").innerHTML =      
