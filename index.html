@@ -1303,7 +1303,7 @@ const options = [
         
         let alloyCheck = document.getElementById("alloyed").value;
 
-        if (alloyCheck === "yes" && await getStat(selectedOption, "hasAlloy") === true) {
+        if (alloyCheck === "yes" && await getStat(selectedOption, "hasAlloy")) {
           document.getElementById("output").innerHTML =      
           await getStat(selectedOption, "alloyedDMG") +
         await getStat(selectedOption, "alloyedDMG") *
@@ -1314,7 +1314,7 @@ const options = [
         else if (alloyCheck === "yes" && await getStat(selectedOption, "hasAlloy") === false){
           document.getElementById("output").innerHTML = "This weapon cannot be alloyed."      
         }
-        else if (await getStat(selectedOption, "elemental1") === true) {
+        else if (await getStat(selectedOption, "elemental1")) {
           document.getElementById("output").innerHTML =      
           await getStat(selectedOption, "baseDMG") +
         await getStat(selectedOption, "baseDMG") *
@@ -1322,7 +1322,7 @@ const options = [
           atunementStats /
           1000
         }
-        else if (await getStat(selectedOption, "elemental2") === true){
+        else if (await getStat(selectedOption, "elemental2")){
           document.getElementById("output").innerHTML =      
           await getStat(selectedOption, "baseDMG") +
         await getStat(selectedOption, "baseDMG") *
