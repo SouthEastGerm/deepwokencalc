@@ -81,11 +81,11 @@
       </select>
       <br><br>  
       <div class="input-group">
-        <label for="weaponStats">Weapon Stat Points:</label>
+        <label for="weaponStats">Weapon Stats:</label>
         <input type="text" id="weaponStats">
       </div>
       <div class="input-group">
-        <label for="atunementStats">Attunement Stat Points:</label>
+        <label for="atunementStats">Attunement Stats:</label>
         <input type="text" id="atunementStats">
       </div>
       <button onclick="updateOutput()">Calculate Damage</button>
@@ -1237,7 +1237,7 @@ const options = [
     "Inquisitor's Straight Sword",
     "First Light",
     "Kyrscleave",
-    "Raillade",
+    "Railblade",
     "Enforcer's Blade",
     "Steel Maul",
     "Forge Greathammer",
@@ -1282,25 +1282,15 @@ const options = [
           let atunementStats = parseFloat(this.value);
         });
 
-
       async function updateOutput() {
         let weaponStats = parseFloat(
           document.getElementById("weaponStats").value
         );
+        console.log(weaponStats);
 
         let atunementStats = parseFloat(
           document.getElementById("atunementStats").value
         );
-        
-        if (isNaN(weaponStats)) {
-          weaponStats = 0;
-        };
-
-        if (isNaN(atunementStats)) {
-          atunementStats = 0;
-        };
-
-        console.log(weaponStats);
         console.log(atunementStats);
 
         let selectedOption = document.getElementById("textBox").value;
