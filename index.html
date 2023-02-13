@@ -1303,18 +1303,16 @@ const options = [
         
         let alloyCheck = document.getElementById("alloyed").value;
 
-        if (alloyCheck === "yes" && await getStat(selectedOption, "hasAlloy")) {
+        async function alloyedTrue() {
           document.getElementById("output").innerHTML =      
           await getStat(selectedOption, "alloyedDMG") +
-        await getStat(selectedOption, "alloyedDMG") *
+          await getStat(selectedOption, "alloyedDMG") *
           await getStat(selectedOption, "alloyedScaling") *
           await weaponStats /
           1000
         }
-        else if (alloyCheck === "yes" && await getStat(selectedOption, "hasAlloy") === false){
-          document.getElementById("output").innerHTML = "This weapon cannot be alloyed."      
-        }
-        else if (await getStat(selectedOption, "elemental1")) {
+
+        async function elemental1True() {
           document.getElementById("output").innerHTML =      
           await getStat(selectedOption, "baseDMG") +
         await getStat(selectedOption, "baseDMG") *
@@ -1322,7 +1320,8 @@ const options = [
           atunementStats /
           1000
         }
-        else if (await getStat(selectedOption, "elemental2")){
+
+        async function elemental2True() {
           document.getElementById("output").innerHTML =      
           await getStat(selectedOption, "baseDMG") +
         await getStat(selectedOption, "baseDMG") *
@@ -1333,13 +1332,30 @@ const options = [
             await getStat(selectedOption, "elementScaling") *
             atunementStats /
             1000
-        } else {
+        }
+
+        async function regularTrue() {
           document.getElementById("output").innerHTML =      
           await getStat(selectedOption, "baseDMG") +
         await getStat(selectedOption, "baseDMG") *
           await getStat(selectedOption, "scaling") *
           weaponStats /
           1000
+        }
+
+        if (alloyCheck === "yes" && await getStat(selectedOption, "hasAlloy")) {
+          alloyedTrue()
+        }
+        else if (alloyCheck === "yes" && await getStat(selectedOption, "hasAlloy") === false){
+          document.getElementById("output").innerHTML = "This weapon cannot be alloyed."      
+        }
+        else if (await getStat(selectedOption, "elemental1")) {
+          elemental1True()
+        }
+        else if (await getStat(selectedOption, "elemental2")){
+          elemental2True()
+        } else {
+          regularTrue()
         }
         }
 
@@ -1350,3 +1366,5 @@ const options = [
     </script>
   </head>
 </html>
+
+
